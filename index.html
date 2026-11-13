@@ -69,6 +69,9 @@
   footer{padding:28px 0 60px;color:var(--muted);font-size:13.5px}
   ul.lim{color:var(--muted);max-width:76ch;padding-left:20px;margin:0}
   ul.lim li{margin:6px 0}
+  pre.code{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;overflow-x:auto;font:13.5px/1.6 ui-monospace,Consolas,monospace;color:var(--text);margin:0 0 14px;tab-size:4}
+  pre.code .c{color:var(--muted)}
+  pre.code .k{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -153,6 +156,34 @@
       <p class="note" style="margin-top:12px">The detector learned from portraits and photo archives, not from webcam video. Treat the live score as a demonstration, not a measurement.</p>
     </div>
   </div>
+</section>
+
+<section id="code">
+  <h2>The code</h2>
+  <p class="sub">The whole trainable part is one small logistic regression on top of frozen CLIP features. This page runs it in JavaScript; <code>train.py</code> in the repository is the same algorithm in Python. It reads the saved features in <code>results/embeddings.json</code>, needs no photos and no GPU, and gives the same 98.7% and the same weights as the browser run.</p>
+<pre class="code"><span class="c"># train.py: python train.py  (needs only numpy)</span>
+EPOCHS, LR, L2 = 1200, 2.0, 1e-4
+
+<span class="k">def</span> train_logreg(X, y):
+    <span class="c">"""Logistic regression, full-batch gradient descent, balanced class weights."""</span>
+    mean = X.mean(axis=0)
+    scale = 1 / np.sqrt(((X - mean) ** 2).sum(axis=1).mean())
+    Z = (X - mean) * scale                      <span class="c"># center and scale the 512 CLIP features</span>
+    n = len(y)
+    weight = np.where(y == 1, n / (2 * y.sum()), n / (2 * (n - y.sum())))
+    w, b = np.zeros(X.shape[1]), 0.0
+    <span class="k">for</span> _ <span class="k">in</span> range(EPOCHS):
+        p = 1 / (1 + np.exp(-(Z @ w + b)))      <span class="c"># predicted probability of "AI"</span>
+        err = (p - y) * weight / n
+        w -= LR * (Z.T @ err + L2 * w)          <span class="c"># gradient step with L2 regularisation</span>
+        b -= LR * err.sum()
+    <span class="k">return</span> {"mean": mean, "scale": scale, "w": w, "b": b}
+
+<span class="k">def</span> predict(model, X):
+    <span class="c">"""Probability that each face is AI-generated."""</span>
+    z = (X - model["mean"]) * model["scale"]
+    <span class="k">return</span> 1 / (1 + np.exp(-(z @ model["w"] + model["b"])))</pre>
+  <p class="note">Full file: <a href="https://github.com/sazmak/faceproof/blob/main/train.py">train.py</a>. Browser version: functions <code>trainLogReg</code> and <code>faceCrop</code> in <a href="https://github.com/sazmak/faceproof/blob/main/index.html">index.html</a>. Features come from the frozen CLIP ViT-B/32 encoder; it is not trained here.</p>
 </section>
 
 <section>
