@@ -117,7 +117,7 @@
   <p class="sub">Our detector follows the UnivFD recipe (Ojha et al., CVPR 2023): a frozen CLIP image encoder with a small trainable linear classifier on top. The encoder is never changed. What changes is the data the classifier learns from.</p>
   <div class="grid g3">
     <div class="card"><div class="num">01 · BEFORE</div><h3>Detectors without our data</h3><p>An open-source deepfake detector from Hugging Face, used as published, and CLIP asked in plain words (“real photo” or “AI-generated”) with no training.</p></div>
-    <div class="card"><div class="num">02 · NEW DATASET</div><h3>420 generated portraits</h3><p>Our own AI-generated people in eight prompt categories, paired with 420 real faces from the open FFHQ set. 80% for training, 20% held out.</p></div>
+    <div class="card"><div class="num">02 · NEW DATASET</div><h3>420 generated portraits</h3><p>Our own AI-generated people, made with Google Flow in eight prompt categories, paired with 420 real faces from the open FFHQ set. 80% for training, 20% held out.</p></div>
     <div class="card"><div class="num">03 · AFTER</div><h3>Detector trained on the new data</h3><p>Same CLIP encoder, now with a classifier trained on the new dataset. All three are scored on the same held-out images.</p></div>
   </div>
 </section>
