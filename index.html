@@ -161,6 +161,7 @@
     <li>The generated test faces come from the same generator and prompts as the generated training faces. The result shows adaptation to this generator, not to every future one.</li>
     <li>Real and generated photos differ in more than origin: the real set is older amateur photography, the generated set looks like polished portraits. Identical cropping and JPEG compression reduce this gap but cannot remove it, so part of the score may come from photo style.</li>
     <li>The test set is small. Differences of a few percentage points are within noise.</li>
+    <li><b>Found when we tested the finished detector by hand.</b> On AI faces from other generators and on webcam frames it mostly answers “real”, and it calls dark-skinned faces “AI” more often. We measured why: the score rises with warm sunny light and with smiling (correlation 0.71 and 0.63), and dark-skinned faces are about 19% of our generated set but about 5% of the real set. The detector learned how this one generator’s portraits differ from older amateur photos, not what AI images look like in general. We report this instead of hiding it; the fix is more varied data, not a different model.</li>
     <li>A detector score is evidence, not proof.</li>
   </ul>
 </section>
