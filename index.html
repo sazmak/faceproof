@@ -7,8 +7,8 @@
 <style>
   :root{
     --bg:#0c0f14; --panel:#141922; --panel2:#1a212d; --line:#273142;
-    --text:#e8edf5; --muted:#93a0b5; --accent:#5eead4; --warn:#fbbf24; --bad:#fb7185; --good:#4ade80;
-    --a:#7c8aa5; --b:#5eead4;
+    --text:#e8edf5; --muted:#93a0b5; --accent:#5eead4; --bad:#fb7185; --good:#4ade80;
+    --m1:#f59e0b; --m2:#8b9ab5; --m3:#5eead4;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
@@ -16,24 +16,22 @@
   .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
   header{padding:56px 0 28px;border-bottom:1px solid var(--line)}
   .tag{font:600 12px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
-  h1{font-size:clamp(30px,5vw,50px);line-height:1.08;margin:14px 0 14px;letter-spacing:-.02em;text-wrap:balance}
+  h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:14px 0 14px;letter-spacing:-.02em;text-wrap:balance}
   h2{font-size:24px;margin:0 0 6px;letter-spacing:-.01em}
   h3{font-size:16px;margin:0 0 6px}
-  .lead{color:var(--muted);font-size:18px;max-width:62ch}
+  .lead{color:var(--muted);font-size:18px;max-width:64ch}
   section{padding:40px 0;border-bottom:1px solid var(--line)}
-  .sub{color:var(--muted);margin:0 0 20px;max-width:70ch}
+  .sub{color:var(--muted);margin:0 0 20px;max-width:72ch}
   .grid{display:grid;gap:14px}
   .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
   .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
   .card p{margin:0;color:var(--muted);font-size:14.5px}
-  .num{font:700 12px ui-monospace,Consolas,monospace;color:var(--accent);margin-bottom:8px}
-  label.pick{display:block;background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:16px;cursor:pointer}
+  .num{font:700 12px ui-monospace,Consolas,monospace;color:var(--accent);margin-bottom:8px;letter-spacing:.06em}
+  label.pick{display:block;background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:16px;cursor:pointer;max-width:420px}
   label.pick:hover{border-color:var(--accent)}
   label.pick input{display:none}
   label.pick b{display:block;margin-bottom:2px}
   label.pick span{color:var(--muted);font-size:13.5px}
-  label.pick em{display:block;margin-top:8px;font:600 13px ui-monospace,Consolas,monospace;color:var(--accent);font-style:normal}
   button{font:600 15px "Segoe UI",system-ui,sans-serif;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 16px;cursor:pointer}
   button.primary{background:var(--accent);color:#06241f;border-color:var(--accent)}
   button:disabled{opacity:.45;cursor:not-allowed}
@@ -42,21 +40,27 @@
   .bar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:8px}
   .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
   table{width:100%;border-collapse:collapse;font-size:14.5px}
-  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
   th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
-  td.n{font:600 14px ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
-  .up{color:var(--good)} .down{color:var(--bad)}
+  td.n{font:600 14px ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums;white-space:nowrap}
+  td small{display:block;color:var(--muted);font:12.5px "Segoe UI",system-ui,sans-serif}
   .tw{overflow-x:auto}
-  .cmp{display:grid;grid-template-columns:150px 1fr 56px;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
-  .cmp .t{height:12px;background:var(--panel2);border-radius:3px;overflow:hidden}
+  .cmp{display:grid;grid-template-columns:minmax(120px,230px) 1fr 60px;gap:10px;align-items:center;font-size:13.5px;margin:7px 0}
+  .cmp .t{height:14px;background:var(--panel2);border-radius:3px;overflow:hidden}
   .cmp .t i{display:block;height:100%}
-  .headline{font-size:20px;margin:0 0 16px;text-wrap:balance}
-  .verdict{font:700 26px/1.1 "Segoe UI",system-ui,sans-serif;margin:6px 0}
-  #preview{max-width:100%;max-height:300px;border-radius:10px;border:1px solid var(--line);display:none}
+  .cmp b{font:600 14px ui-monospace,Consolas,monospace;text-align:right}
+  .headline{font-size:21px;margin:0 0 18px;text-wrap:balance;max-width:60ch}
+  .verdict{font:700 24px/1.1 "Segoe UI",system-ui,sans-serif;margin:6px 0}
+  #preview{width:100%;max-width:256px;border-radius:10px;border:1px solid var(--line);display:none}
+  .strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .strip img{width:84px;height:84px;border-radius:6px;border:1px solid var(--line)}
   .hide{display:none}
-  .note{font-size:13.5px;color:var(--muted)}
+  .note{font-size:13.5px;color:var(--muted);max-width:80ch}
   code{font:13px ui-monospace,Consolas,monospace;background:var(--panel2);padding:1px 5px;border-radius:4px}
+  svg text{font:12px "Segoe UI",system-ui,sans-serif;fill:var(--muted)}
   footer{padding:28px 0 60px;color:var(--muted);font-size:13.5px}
+  ul.lim{color:var(--muted);max-width:76ch;padding-left:20px;margin:0}
+  ul.lim li{margin:6px 0}
 </style>
 </head>
 <body>
@@ -65,134 +69,185 @@
 <header>
   <div class="tag">ICT · Assignment #2 · Computer Vision · Option B</div>
   <h1>Detectors miss faces from generators they have never seen. We fix that with data.</h1>
-  <p class="lead">FaceProof takes a real-vs-AI face detector, adds a new set of 314 AI-generated faces to its training data, and measures how much better it catches fakes from the new generator.</p>
+  <p class="lead">FaceProof builds a new dataset of 420 AI-generated portraits, adds it to real photos, and measures how much a detector trained on it improves over detectors that never saw this generator.</p>
 </header>
 
-<section>
-  <h2>How it works</h2>
-  <p class="sub">The detector follows the UnivFD recipe (Ojha et al., CVPR 2023): a frozen CLIP image encoder and a small trainable linear classifier on top. Only the training data changes between the two versions.</p>
-  <div class="grid g3">
-    <div class="card"><div class="num">01 · ORIGINAL DATASET</div><h3>Baseline detector</h3><p>Trained on real faces and fakes from an open dataset (older generator).</p></div>
-    <div class="card"><div class="num">02 · ENRICHED DATASET</div><h3>Improved detector</h3><p>Same model, same settings. Training set extended with our newly generated faces.</p></div>
-    <div class="card"><div class="num">03 · COMPARISON</div><h3>Same held-out test</h3><p>Both versions are scored on images neither has seen: real, old fakes, new fakes.</p></div>
-  </div>
-</section>
-
 <section id="lab">
-  <h2>Experiment</h2>
-  <p class="sub">Choose three folders. Everything runs in this browser tab: the photos are not uploaded anywhere. The first run downloads the CLIP encoder (about 90 MB) from Hugging Face.</p>
-  <div class="grid g3">
-    <label class="pick"><b>Real faces</b><span>Photos of real people, e.g. FFHQ</span><input type="file" id="fReal" webkitdirectory multiple accept="image/*"><em id="cReal">no folder chosen</em></label>
-    <label class="pick"><b>Original fakes</b><span>AI faces from the open dataset</span><input type="file" id="fOld" webkitdirectory multiple accept="image/*"><em id="cOld">no folder chosen</em></label>
-    <label class="pick"><b>New fakes (ours)</b><span>The 314 newly generated faces</span><input type="file" id="fNew" webkitdirectory multiple accept="image/*"><em id="cNew">no folder chosen</em></label>
-  </div>
-  <div class="row">
-    <button class="primary" id="run" disabled>Run experiment</button>
-    <button id="exportBtn" disabled>Export results.json</button>
-    <span class="note">Split: 80% train / 20% test, fixed seed 42.</span>
-  </div>
-  <div class="bar"><i id="prog"></i></div>
-  <div class="status" id="status">Waiting for three folders (at least 20 images each).</div>
-
-  <div id="results" class="hide" style="margin-top:28px">
+  <h2>Result</h2>
+  <p class="sub" id="resultSub">Loading saved results…</p>
+  <div id="results" class="hide">
     <p class="headline" id="headline"></p>
-    <div id="bars" style="margin-bottom:22px"></div>
+    <div id="bars" style="margin-bottom:24px"></div>
     <div class="tw"><table>
-      <thead><tr><th>Metric (held-out test)</th><th>Baseline · original data</th><th>Improved · enriched data</th><th>Change</th></tr></thead>
+      <thead><tr><th>Detector</th><th>Training data</th><th>Accuracy</th><th>New AI faces caught</th><th>Real faces kept real</th><th>ROC AUC</th></tr></thead>
       <tbody id="tbody"></tbody>
     </table></div>
     <p class="note" id="sizes" style="margin-top:12px"></p>
+
+    <h3 style="margin-top:34px">How many new images are needed?</h3>
+    <p class="sub" style="margin-bottom:8px">Accuracy on the same test set when our detector is trained on only N generated faces and N real faces. Each point below the full size is the mean of 5 random subsets; the band shows the lowest and highest run.</p>
+    <div id="curve"></div>
+
+    <div id="samplesBox" class="hide">
+      <h3 style="margin-top:30px">What the detectors see</h3>
+      <p class="sub" style="margin-bottom:0">Every image, real or generated, goes through the same steps: find the face, crop a square around it, resize to 256×256, save as JPEG. Examples from our generated set:</p>
+      <div class="strip" id="samples"></div>
+    </div>
+  </div>
+  <div class="row">
+    <button id="run">Re-run experiment</button>
+    <button id="exportBtn" disabled>Export results.json</button>
+    <span class="note">Re-running needs the <code>data/</code> folder next to this page and the local server.</span>
+  </div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="status" id="status"></div>
+  <div class="strip" id="live"></div>
+</section>
+
+<section>
+  <h2>How it works</h2>
+  <p class="sub">Our detector follows the UnivFD recipe (Ojha et al., CVPR 2023): a frozen CLIP image encoder with a small trainable linear classifier on top. The encoder is never changed. What changes is the data the classifier learns from.</p>
+  <div class="grid g3">
+    <div class="card"><div class="num">01 · BEFORE</div><h3>Detectors without our data</h3><p>An open-source deepfake detector from Hugging Face, used as published, and CLIP asked in plain words (“real photo” or “AI-generated”) with no training.</p></div>
+    <div class="card"><div class="num">02 · NEW DATASET</div><h3>420 generated portraits</h3><p>Our own AI-generated people in eight prompt categories, paired with 420 real faces from the open FFHQ set. 80% for training, 20% held out.</p></div>
+    <div class="card"><div class="num">03 · AFTER</div><h3>Detector trained on the new data</h3><p>Same CLIP encoder, now with a classifier trained on the new dataset. All three are scored on the same held-out images.</p></div>
   </div>
 </section>
 
 <section id="try">
   <h2>Try the detector</h2>
-  <p class="sub">Upload one face photo and compare what both versions say. Available after the experiment has been run once in this browser, or after importing a saved model file.</p>
-  <div class="row" style="margin-top:0">
-    <label class="pick" style="flex:1;min-width:240px"><b>Choose a photo</b><span>JPG, PNG or WebP</span><input type="file" id="one" accept="image/*"></label>
-    <label class="pick" style="flex:1;min-width:240px"><b>Import models.json</b><span>Saved by "Export results.json"</span><input type="file" id="imp" accept=".json"></label>
-  </div>
+  <p class="sub">Upload a portrait. The page finds the face and shows what each detector says. The photo stays in this browser tab.</p>
+  <label class="pick"><b>Choose a photo</b><span>JPG, PNG or WebP with one visible face</span><input type="file" id="one" accept="image/*"></label>
   <div class="status" id="tryStatus"></div>
   <div class="grid g3" style="margin-top:14px;align-items:start">
-    <img id="preview" alt="Uploaded photo">
-    <div class="card hide" id="vA"><div class="num" style="color:var(--a)">BASELINE</div><div class="verdict" id="vAt"></div><p id="vAp"></p></div>
-    <div class="card hide" id="vB"><div class="num">IMPROVED</div><div class="verdict" id="vBt"></div><p id="vBp"></p></div>
+    <img id="preview" alt="Face crop used by the detectors">
+    <div class="card hide" id="v3"><div class="num">OURS · TRAINED ON NEW DATA</div><div class="verdict" id="v3t"></div><p id="v3p"></p></div>
+    <div class="card hide" id="v2"><div class="num" style="color:var(--m2)">CLIP · NO TRAINING</div><div class="verdict" id="v2t"></div><p id="v2p"></p></div>
+    <div class="card hide" id="v1"><div class="num" style="color:var(--m1)">OPEN-SOURCE DETECTOR</div><div class="verdict" id="v1t"></div><p id="v1p"></p></div>
   </div>
 </section>
 
 <section>
   <h2>Limits</h2>
-  <p class="sub">A detector score is evidence, not proof. Results depend on the generators and photo styles in the training data, the test set is small, and heavy compression or editing can change the answer. Numbers on this page come only from the experiment you run here.</p>
+  <ul class="lim">
+    <li>The generated test faces come from the same generator and prompts as the generated training faces. The result shows adaptation to this generator, not to every future one.</li>
+    <li>Real and generated photos differ in more than origin: the real set is older amateur photography, the generated set looks like polished portraits. Identical cropping and JPEG compression reduce this gap but cannot remove it, so part of the score may come from photo style.</li>
+    <li>The test set is small. Differences of a few percentage points are within noise.</li>
+    <li>A detector score is evidence, not proof.</li>
+  </ul>
 </section>
 
-<footer>FaceProof · student research project · source code and step-by-step journal are in the repository.</footer>
+<footer>FaceProof · student research project · source code, dataset split and step-by-step journal are in the repository.</footer>
 </div>
 
 <script type="module">
-import { AutoProcessor, CLIPVisionModelWithProjection, RawImage, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+import { AutoProcessor, AutoTokenizer, CLIPVisionModelWithProjection, CLIPTextModelWithProjection, RawImage, pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 env.allowLocalModels = false;
 
+// ---------- Fixed settings (chosen before looking at any test result) ----------
 const ENCODER = 'Xenova/clip-vit-base-patch32';
-const SEED = 42, TEST_FRAC = 0.2, MIN_IMAGES = 20;
-const $ = id => document.getElementById(id);
-const sets = { real: [], old: [], fresh: [] };
-let processor, encoder, models = null, lastResults = null;
+const EXISTING = 'onnx-community/Deep-Fake-Detector-v2-Model-ONNX';   // labels: Realism / Deepfake
+const PROMPTS = {
+  real: ['a photo of a real person', 'a real photograph of a human face'],
+  fake: ['an AI-generated image of a person', 'a synthetic AI-generated human face']
+};
+const MP = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14';
+const FACE_MODEL = 'https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite';
+const CROP_SCALE = 2.0, CROP_SIZE = 256, JPEG_Q = 0.75, MIN_FACE = 80, MIN_SCORE = 0.75;   // faces under 80 px or under 0.75 confidence are treated as "no face"
+const CURVE_N = [5, 10, 25, 50, 100, 200], CURVE_REPS = 5, SEED = 42;
 
-const isImage = f => /\.(jpe?g|png|webp|bmp|jfif)$/i.test(f.name);
+const $ = id => document.getElementById(id);
 const setStatus = t => { $('status').textContent = t; };
 const setProg = p => { $('prog').style.width = (p * 100).toFixed(1) + '%'; };
+const tick = () => new Promise(r => setTimeout(r));
+let processor, encoder, faceDet, existingPipe, R = null;
 
-function bindPicker(inputId, countId, key) {
-  $(inputId).addEventListener('change', e => {
-    sets[key] = [...e.target.files].filter(isImage).sort((a, b) => a.name.localeCompare(b.name));
-    $(countId).textContent = sets[key].length + ' images';
-    const ok = Object.values(sets).every(s => s.length >= MIN_IMAGES);
-    $('run').disabled = !ok;
-    if (ok) setStatus('Ready.');
-  });
-}
-bindPicker('fReal', 'cReal', 'real'); bindPicker('fOld', 'cOld', 'old'); bindPicker('fNew', 'cNew', 'fresh');
-
+// ---------- Models ----------
 async function loadEncoder(report) {
   if (encoder) return;
-  report('Loading CLIP encoder (first run downloads about 90 MB)…');
+  report('Loading CLIP image encoder…');
   processor = await AutoProcessor.from_pretrained(ENCODER);
-  encoder = await CLIPVisionModelWithProjection.from_pretrained(ENCODER, {
-    quantized: true,
-    progress_callback: p => { if (p.status === 'progress' && p.file && p.file.endsWith('.onnx')) report(`Downloading encoder: ${Math.round(p.progress)}%`); }
-  });
+  encoder = await CLIPVisionModelWithProjection.from_pretrained(ENCODER, { quantized: true });
+}
+async function loadFace(report) {
+  if (faceDet) return;
+  report('Loading face detector…');
+  const mp = await import(MP + '/vision_bundle.mjs');
+  const fileset = await mp.FilesetResolver.forVisionTasks(MP + '/wasm');
+  faceDet = await mp.FaceDetector.createFromOptions(fileset, { baseOptions: { modelAssetPath: FACE_MODEL, delegate: 'CPU' }, runningMode: 'IMAGE', minDetectionConfidence: 0.4 });
+}
+async function loadExisting(report) {
+  if (existingPipe) return;
+  report('Loading open-source detector (about 85 MB on first use)…');
+  existingPipe = await pipeline('image-classification', EXISTING, { quantized: true });
+}
+async function textVectors(report) {
+  report('Loading CLIP text encoder…');
+  const tok = await AutoTokenizer.from_pretrained(ENCODER);
+  const tm = await CLIPTextModelWithProjection.from_pretrained(ENCODER, { quantized: true });
+  const out = {};
+  for (const k of ['real', 'fake']) {
+    const { text_embeds } = await tm(tok(PROMPTS[k], { padding: true, truncation: true }));
+    const d = text_embeds.dims[1], avg = new Float64Array(d);
+    for (let i = 0; i < PROMPTS[k].length; i++) {
+      const row = text_embeds.data.slice(i * d, (i + 1) * d); let n = 0; for (const x of row) n += x * x; n = Math.sqrt(n);
+      for (let j = 0; j < d; j++) avg[j] += row[j] / n;
+    }
+    let n = 0; for (const x of avg) n += x * x; n = Math.sqrt(n);
+    out[k] = Array.from(avg, x => +(x / n).toFixed(6));
+  }
+  return out;
 }
 
-async function embed(file) {
-  const image = (await RawImage.fromBlob(file)).rgb();
-  const inputs = await processor(image);
-  const { image_embeds } = await encoder(inputs);
+// ---------- Same preprocessing for every image ----------
+async function faceCrop(blob) {
+  const bmp = await createImageBitmap(blob);
+  const W = bmp.width, H = bmp.height;
+  let cx = W / 2, cy = H / 2, side = Math.min(W, H), found = false;
+  // Look for faces in the whole image and, for large images, in overlapping tiles (small faces are missed otherwise).
+  const boxes = [];
+  const look = (src, ox, oy) => { for (const d of faceDet.detect(src).detections || []) { const b = d.boundingBox; const s = d.categories && d.categories[0] ? d.categories[0].score : 0; if (s >= MIN_SCORE) boxes.push({ x: ox + b.originX, y: oy + b.originY, w: b.width, h: b.height, s }); } };
+  const tiles = t => { const c = document.createElement('canvas'); c.width = c.height = t; const g = c.getContext('2d'); for (let ty = 0; ty <= H - t; ty += t / 2) for (let tx = 0; tx <= W - t; tx += t / 2) { g.drawImage(bmp, tx, ty, t, t, 0, 0, t, t); look(c, tx, ty); } };
+  look(bmp, 0, 0);
+  if (Math.min(W, H) > 512) { tiles(Math.round(Math.min(W, H) / 2)); if (!boxes.length) tiles(Math.round(Math.min(W, H) / 4)); }
+  const b = boxes.sort((p, q) => q.s - p.s)[0];   // the most confident detection; large low-confidence boxes are usually not faces
+  if (b && Math.max(b.w, b.h) >= MIN_FACE) {
+    cx = b.x + b.w / 2; cy = b.y + b.h / 2 - 0.08 * b.h;
+    side = Math.min(W, H, CROP_SCALE * Math.max(b.w, b.h)); found = true;
+  }
+  const x = Math.max(0, Math.min(W - side, cx - side / 2)), y = Math.max(0, Math.min(H - side, cy - side / 2));
+  const c = document.createElement('canvas'); c.width = c.height = CROP_SIZE;
+  const g = c.getContext('2d'); g.imageSmoothingQuality = 'high';
+  g.drawImage(bmp, x, y, side, side, 0, 0, CROP_SIZE, CROP_SIZE);
+  bmp.close();
+  const jpeg = await new Promise(res => c.toBlob(res, 'image/jpeg', JPEG_Q));
+  return { jpeg, found };
+}
+async function embedRaw(raw) {
+  const { image_embeds } = await encoder(await processor(raw));
   const v = Float32Array.from(image_embeds.data);
   let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1;
   for (let i = 0; i < v.length; i++) v[i] /= n;
   return v;
 }
-
-function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
-function split(arr, seed) {
-  const r = rng(seed), a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
-  const nTest = Math.max(1, Math.round(a.length * TEST_FRAC));
-  return { test: a.slice(0, nTest), train: a.slice(nTest) };
+async function existingScore(raw) {
+  const out = (await existingPipe(raw, { topk: 5 })).flat();
+  const hit = out.find(o => /fake/i.test(o.label));
+  return hit ? hit.score : 0;
 }
 
-// Logistic regression on centred, globally scaled embeddings. Class-balanced loss, full-batch gradient descent.
+// ---------- Classifiers ----------
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function sample(arr, n, seed) { const r = rng(seed), a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); }
+// Logistic regression on centred, globally scaled embeddings; class-balanced loss; full-batch gradient descent.
 function trainLogReg(X, y, { epochs = 1200, lr = 2.0, l2 = 1e-4 } = {}) {
-  const n = X.length, d = X[0].length;
-  const mean = new Float64Array(d);
+  const n = X.length, d = X[0].length, mean = new Float64Array(d);
   for (const x of X) for (let j = 0; j < d; j++) mean[j] += x[j] / n;
   let sq = 0; for (const x of X) for (let j = 0; j < d; j++) { const c = x[j] - mean[j]; sq += c * c; }
   const scale = 1 / Math.sqrt(sq / n || 1);
   const Z = X.map(x => { const z = new Float64Array(d); for (let j = 0; j < d; j++) z[j] = (x[j] - mean[j]) * scale; return z; });
-  const nPos = y.reduce((s, v) => s + v, 0), nNeg = n - nPos;
-  const wPos = n / (2 * nPos), wNeg = n / (2 * nNeg);
-  const w = new Float64Array(d); let b = 0;
-  const g = new Float64Array(d);
+  const nPos = y.reduce((s, v) => s + v, 0), nNeg = n - nPos, wPos = n / (2 * nPos), wNeg = n / (2 * nNeg);
+  const w = new Float64Array(d), g = new Float64Array(d); let b = 0;
   for (let ep = 0; ep < epochs; ep++) {
     g.fill(0); let gb = 0;
     for (let i = 0; i < n; i++) {
@@ -206,130 +261,165 @@ function trainLogReg(X, y, { epochs = 1200, lr = 2.0, l2 = 1e-4 } = {}) {
   }
   return { mean: Array.from(mean), scale, w: Array.from(w), b };
 }
-function predict(m, x) { let s = m.b; for (let j = 0; j < x.length; j++) s += m.w[j] * (x[j] - m.mean[j]) * m.scale; return 1 / (1 + Math.exp(-s)); }
-
-function auc(scoresPos, scoresNeg) {
-  let wins = 0; for (const p of scoresPos) for (const q of scoresNeg) wins += p > q ? 1 : p === q ? 0.5 : 0;
-  return wins / (scoresPos.length * scoresNeg.length);
+const sigmoid = s => 1 / (1 + Math.exp(-s));
+function predict(m, x) { let s = m.b; for (let j = 0; j < x.length; j++) s += m.w[j] * (x[j] - m.mean[j]) * m.scale; return sigmoid(s); }
+function zeroShot(text, x) { let a = 0, b = 0; for (let j = 0; j < x.length; j++) { a += x[j] * text.fake[j]; b += x[j] * text.real[j]; } return sigmoid(100 * (a - b)); }
+function auc(pos, neg) { let w = 0; for (const p of pos) for (const q of neg) w += p > q ? 1 : p === q ? 0.5 : 0; return w / (pos.length * neg.length); }
+function metrics(pFake, pReal) {
+  const tp = pFake.filter(p => p >= 0.5).length, tn = pReal.filter(p => p < 0.5).length;
+  return { accuracy: (tp + tn) / (pFake.length + pReal.length), recallFake: tp / pFake.length, realCorrect: tn / pReal.length, auc: auc(pFake, pReal), tp, tn, nFake: pFake.length, nReal: pReal.length };
 }
-function evaluate(m, T) {
-  const pr = T.real.map(x => predict(m, x)), po = T.old.map(x => predict(m, x)), pn = T.fresh.map(x => predict(m, x));
-  const frac = (a, f) => a.filter(f).length / a.length;
-  const tnr = frac(pr, p => p < 0.5), recOld = frac(po, p => p >= 0.5), recNew = frac(pn, p => p >= 0.5);
-  const total = pr.length + po.length + pn.length;
-  return {
-    accuracy: (tnr * pr.length + recOld * po.length + recNew * pn.length) / total,
-    balancedAccuracy: (tnr + (recOld * po.length + recNew * pn.length) / (po.length + pn.length)) / 2,
-    recallNewFakes: recNew, recallOldFakes: recOld, realCorrect: tnr,
-    auc: auc([...po, ...pn], pr)
-  };
-}
+function wilson(p, n) { const z = 1.96, d = 1 + z * z / n, c = p + z * z / (2 * n), h = z * Math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)); return [(c - h) / d, (c + h) / d]; }
 
+// ---------- Rendering ----------
 const pct = v => (v * 100).toFixed(1) + '%';
 function render(res) {
+  R = res;
+  const M = res.methods, n = M.ours.nFake + M.ours.nReal;
   const rows = [
-    ['New-generator fakes caught (recall)', 'recallNewFakes'],
-    ['Original fakes caught (recall)', 'recallOldFakes'],
-    ['Real faces kept as real', 'realCorrect'],
-    ['Balanced accuracy', 'balancedAccuracy'],
-    ['Accuracy (all test images)', 'accuracy'],
-    ['ROC AUC', 'auc']
+    ['Open-source detector', `<small>${res.existing}</small>`, 'Its own original dataset. Never saw our generator.', M.existing],
+    ['CLIP, no training', '<small>zero-shot text prompts</small>', 'None', M.zeroshot],
+    ['Ours: CLIP + linear classifier', '<small>UnivFD recipe</small>', `New dataset: ${res.sizes.train.fake} generated + ${res.sizes.train.real} real`, M.ours]
   ];
-  $('tbody').innerHTML = rows.map(([label, k]) => {
-    const a = res.baseline[k], b = res.improved[k], d = (b - a) * 100;
-    const cls = Math.abs(d) < 0.05 ? '' : d > 0 ? 'up' : 'down';
-    const fmt = k === 'auc' ? v => v.toFixed(3) : pct;
-    const dTxt = k === 'auc' ? (b - a >= 0 ? '+' : '') + (b - a).toFixed(3) : (d >= 0 ? '+' : '') + d.toFixed(1) + ' pp';
-    return `<tr><td>${label}</td><td class="n">${fmt(a)}</td><td class="n">${fmt(b)}</td><td class="n ${cls}">${dTxt}</td></tr>`;
-  }).join('');
+  $('tbody').innerHTML = rows.map(([name, sub, data, m]) =>
+    `<tr><td><b>${name}</b>${sub}</td><td>${data}</td><td class="n">${pct(m.accuracy)}</td><td class="n">${pct(m.recallFake)}<small>${m.tp} of ${m.nFake}</small></td><td class="n">${pct(m.realCorrect)}<small>${m.tn} of ${m.nReal}</small></td><td class="n">${m.auc.toFixed(3)}</td></tr>`).join('');
   const line = (name, v, color) => `<div class="cmp"><span>${name}</span><div class="t"><i style="width:${(v * 100).toFixed(1)}%;background:${color}"></i></div><b>${pct(v)}</b></div>`;
-  $('bars').innerHTML = '<div class="note" style="margin-bottom:6px">New-generator fakes caught</div>' +
-    line('Baseline', res.baseline.recallNewFakes, 'var(--a)') + line('Improved', res.improved.recallNewFakes, 'var(--b)');
-  const a = res.baseline.recallNewFakes, b = res.improved.recallNewFakes;
-  $('headline').textContent = b > a
-    ? `Adding ${res.sizes.train.fresh} new synthetic faces to training raised detection of the new generator from ${pct(a)} to ${pct(b)}.`
-    : `On this data the enriched training set did not raise detection of the new generator (${pct(a)} → ${pct(b)}).`;
-  const s = res.sizes;
-  $('sizes').textContent = `Train: ${s.train.real} real, ${s.train.old} original fakes, ${s.train.fresh} new fakes (new fakes used only by the improved version). Test: ${s.test.real} real, ${s.test.old} original fakes, ${s.test.fresh} new fakes. Encoder: ${ENCODER}, linear head, threshold 0.5.`;
+  $('bars').innerHTML = '<div class="note" style="margin-bottom:6px">Accuracy on the held-out test set</div>' +
+    line('Open-source detector', M.existing.accuracy, 'var(--m1)') + line('CLIP, no training', M.zeroshot.accuracy, 'var(--m2)') + line('Ours, trained on new data', M.ours.accuracy, 'var(--m3)');
+  const best = Math.max(M.existing.accuracy, M.zeroshot.accuracy);
+  $('headline').textContent = M.ours.accuracy > best
+    ? `Without our data, the best detector reached ${pct(best)} accuracy on the new faces. Trained on the new dataset, the same kind of model reaches ${pct(M.ours.accuracy)}.`
+    : `On this test set the detector trained on the new dataset (${pct(M.ours.accuracy)}) did not beat the best detector without our data (${pct(best)}).`;
+  const ci = wilson(M.ours.accuracy, n);
+  $('sizes').textContent = `Test set: ${M.ours.nFake} generated and ${M.ours.nReal} real faces that no detector trained on here. A decision counts as “AI” at probability 0.5 or higher. 95% interval for our accuracy: ${pct(ci[0])} to ${pct(ci[1])}. A usable face was found in ${res.faceFound.fake.found} of ${res.faceFound.fake.total} generated and ${res.faceFound.real.found} of ${res.faceFound.real.total} real images; the rest were left out of training and testing. Run on ${res.date.slice(0, 10)}.`;
+  $('resultSub').textContent = 'Three detectors, one held-out test set. Only the last one has seen images from our generator.';
+  drawCurve(res);
+  if (res.samples && res.samples.length) { $('samples').innerHTML = res.samples.map(s => `<img src="${s}" alt="Generated face crop">`).join(''); $('samplesBox').classList.remove('hide'); }
   $('results').classList.remove('hide');
   $('exportBtn').disabled = false;
 }
+function drawCurve(res) {
+  const W = 760, H = 300, L = 46, Rt = 150, T = 14, B = 36, pts = res.curve;
+  const lo = Math.min(0.5, ...pts.map(p => p.min), res.methods.existing.accuracy, res.methods.zeroshot.accuracy) - 0.03;
+  const xs = n => L + (Math.log(n) - Math.log(pts[0].n)) / (Math.log(pts[pts.length - 1].n) - Math.log(pts[0].n)) * (W - L - Rt);
+  const ys = v => T + (1 - (v - lo) / (1 - lo)) * (H - T - B);
+  let s = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:${W}px;height:auto" role="img" aria-label="Accuracy by number of training images">`;
+  for (const v of [0.5, 0.6, 0.7, 0.8, 0.9, 1].filter(v => v >= lo)) s += `<line x1="${L}" x2="${W - Rt}" y1="${ys(v)}" y2="${ys(v)}" stroke="var(--line)"/><text x="${L - 8}" y="${ys(v) + 4}" text-anchor="end">${v * 100}%</text>`;
+  for (const p of pts) s += `<text x="${xs(p.n)}" y="${H - 14}" text-anchor="middle">${p.n}</text>`;
+  s += `<text x="${(L + W - Rt) / 2}" y="${H}" text-anchor="middle">generated faces in training (same number of real faces)</text>`;
+  const ref = (v, color, label) => `<line x1="${L}" x2="${W - Rt}" y1="${ys(v)}" y2="${ys(v)}" stroke="${color}" stroke-width="2" stroke-dasharray="6 5"/><text x="${W - Rt + 8}" y="${ys(v) + 4}" style="fill:${color}">${label} ${pct(v)}</text>`;
+  s += ref(res.methods.existing.accuracy, 'var(--m1)', 'Open-source') + ref(res.methods.zeroshot.accuracy, 'var(--m2)', 'CLIP, no training');
+  s += `<polygon points="${pts.map(p => `${xs(p.n)},${ys(p.max)}`).join(' ')} ${pts.slice().reverse().map(p => `${xs(p.n)},${ys(p.min)}`).join(' ')}" fill="var(--m3)" opacity=".18"/>`;
+  s += `<polyline points="${pts.map(p => `${xs(p.n)},${ys(p.mean)}`).join(' ')}" fill="none" stroke="var(--m3)" stroke-width="2.5"/>`;
+  for (const p of pts) s += `<circle cx="${xs(p.n)}" cy="${ys(p.mean)}" r="4" fill="var(--m3)"><title>${p.n} images: ${pct(p.mean)} (${pct(p.min)} to ${pct(p.max)})</title></circle>`;
+  const last = pts[pts.length - 1];
+  s += `<text x="${xs(last.n) + 8}" y="${ys(last.mean) - 8}" style="fill:var(--m3);font-weight:600">Ours ${pct(last.mean)}</text></svg>`;
+  $('curve').innerHTML = s;
+}
 
-$('run').addEventListener('click', async () => {
+// ---------- Experiment ----------
+async function getJSON(url) { const r = await fetch(url, { cache: 'no-store' }); if (!r.ok) throw new Error(url + ' → ' + r.status); return r.json(); }
+async function putJSON(url, obj) { try { const r = await fetch(url, { method: 'PUT', body: JSON.stringify(obj) }); return r.ok; } catch (e) { return false; } }
+const blobToDataURL = b => new Promise(res => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.readAsDataURL(b); });
+
+async function buildCache(split) {
+  await loadFace(setStatus); await loadEncoder(setStatus); await loadExisting(setStatus);
+  const cache = { emb: { real: { train: [], test: [] }, fake: { train: [], test: [] } }, existing: { real: [], fake: [] }, faceFound: { found: 0, total: 0, fake: { found: 0, total: 0 }, real: { found: 0, total: 0 }, skipped: [] }, samples: [] };
+  const jobs = []; for (const part of ['test', 'train']) for (const cls of ['fake', 'real']) for (const name of split[cls][part]) jobs.push({ cls, part, name });
+  const t0 = performance.now(); $('live').innerHTML = '';
+  for (let i = 0; i < jobs.length; i++) {
+    const { cls, part, name } = jobs[i];
+    const blob = await (await fetch(`data/${cls}/${encodeURIComponent(name)}`)).blob();
+    const { jpeg, found } = await faceCrop(blob);
+    cache.faceFound.total++; cache.faceFound[cls].total++;
+    setProg((i + 1) / jobs.length);
+    if (!found) { cache.faceFound.skipped.push(`${cls}/${name}`); continue; }   // images without a usable face are left out for both classes
+    cache.faceFound.found++; cache.faceFound[cls].found++;
+    const raw = await RawImage.fromBlob(jpeg);
+    cache.emb[cls][part].push(Array.from(await embedRaw(raw), x => +x.toFixed(5)));
+    if (part === 'test') cache.existing[cls].push(+(await existingScore(raw)).toFixed(5));
+    const shown = $('live').querySelectorAll(`img[data-c="${cls}"]`).length;
+    if (shown < 8) { const url = await blobToDataURL(jpeg); $('live').insertAdjacentHTML('beforeend', `<img data-c="${cls}" src="${url}" alt="${cls} crop">`); if (cls === 'fake' && cache.samples.length < 8) cache.samples.push(url); }
+    if (i % 3 === 0) { const eta = (performance.now() - t0) / (i + 1) * (jobs.length - i - 1) / 1000; setStatus(`Preparing images: ${i + 1}/${jobs.length} · about ${Math.ceil(eta)} s left`); await tick(); }
+  }
+  return cache;
+}
+
+async function runExperiment() {
   $('run').disabled = true;
   try {
-    await loadEncoder(setStatus);
-    const E = {}; const total = sets.real.length + sets.old.length + sets.fresh.length; let done = 0, skipped = 0;
-    const t0 = performance.now();
-    for (const key of ['real', 'old', 'fresh']) {
-      E[key] = [];
-      for (const f of sets[key]) {
-        try { E[key].push(await embed(f)); } catch (err) { skipped++; console.warn('Skipped', f.name, err); }
-        done++; setProg(done / total);
-        if (done % 5 === 0) { const eta = (performance.now() - t0) / done * (total - done) / 1000; setStatus(`Encoding images: ${done}/${total} · about ${Math.ceil(eta)} s left`); await new Promise(r => setTimeout(r)); }
-      }
-    }
-    setStatus('Training both versions…'); await new Promise(r => setTimeout(r, 30));
-    const S = { real: split(E.real, SEED), old: split(E.old, SEED + 1), fresh: split(E.fresh, SEED + 2) };
-    const T = { real: S.real.test, old: S.old.test, fresh: S.fresh.test };
-    const lab = (arr, v) => arr.map(() => v);
-    const XA = [...S.real.train, ...S.old.train], yA = [...lab(S.real.train, 0), ...lab(S.old.train, 1)];
-    const XB = [...XA, ...S.fresh.train], yB = [...yA, ...lab(S.fresh.train, 1)];
-    const mA = trainLogReg(XA, yA), mB = trainLogReg(XB, yB);
-    models = { encoder: ENCODER, baseline: mA, improved: mB };
-    lastResults = {
-      date: new Date().toISOString(), encoder: ENCODER, seed: SEED, skippedImages: skipped,
-      sizes: { train: { real: S.real.train.length, old: S.old.train.length, fresh: S.fresh.train.length }, test: { real: T.real.length, old: T.old.length, fresh: T.fresh.length } },
-      baseline: evaluate(mA, T), improved: evaluate(mB, T)
+    const split = await getJSON('splits/split.json');
+    let cache; try { cache = await getJSON('results/embeddings.json'); setStatus('Using cached image features from results/embeddings.json.'); } catch (e) { cache = null; }
+    if (!cache) { cache = await buildCache(split); await putJSON('results/embeddings.json', cache); }
+    const text = (R && R.text) || await textVectors(setStatus);
+    setStatus('Training…'); await tick();
+    const E = cache.emb, lab = (a, v) => a.map(() => v);
+    const full = trainLogReg([...E.real.train, ...E.fake.train], [...lab(E.real.train, 0), ...lab(E.fake.train, 1)]);
+    const methods = {
+      existing: metrics(cache.existing.fake, cache.existing.real),
+      zeroshot: metrics(E.fake.test.map(x => zeroShot(text, x)), E.real.test.map(x => zeroShot(text, x))),
+      ours: metrics(E.fake.test.map(x => predict(full, x)), E.real.test.map(x => predict(full, x)))
     };
-    render(lastResults);
-    try { localStorage.setItem('faceproof-models', JSON.stringify(models)); localStorage.setItem('faceproof-results', JSON.stringify(lastResults)); } catch (e) {}
-    setStatus(`Done in ${((performance.now() - t0) / 1000).toFixed(0)} s.` + (skipped ? ` ${skipped} files could not be read and were skipped.` : ''));
-  } catch (err) {
-    console.error(err); setStatus('Error: ' + (err && err.message ? err.message : err));
-  }
+    const curve = [];
+    for (const n of CURVE_N.filter(n => n < E.fake.train.length)) {
+      const accs = [];
+      for (let r = 0; r < CURVE_REPS; r++) {
+        const f = sample(E.fake.train, n, SEED + 100 * n + r), q = sample(E.real.train, n, SEED + 100 * n + r + 50);
+        const m = trainLogReg([...q, ...f], [...lab(q, 0), ...lab(f, 1)]);
+        accs.push(metrics(E.fake.test.map(x => predict(m, x)), E.real.test.map(x => predict(m, x))).accuracy);
+        setStatus(`Learning curve: ${n} images, run ${r + 1}/${CURVE_REPS}`); await tick();
+      }
+      curve.push({ n, mean: accs.reduce((a, b) => a + b) / accs.length, min: Math.min(...accs), max: Math.max(...accs) });
+    }
+    curve.push({ n: E.fake.train.length, mean: methods.ours.accuracy, min: methods.ours.accuracy, max: methods.ours.accuracy });
+    const res = {
+      date: new Date().toISOString(), encoder: ENCODER, existing: EXISTING, prompts: PROMPTS,
+      preprocessing: { cropScale: CROP_SCALE, size: CROP_SIZE, jpegQuality: JPEG_Q }, seed: SEED,
+      sizes: { train: { real: E.real.train.length, fake: E.fake.train.length }, test: { real: E.real.test.length, fake: E.fake.test.length } },
+      faceFound: cache.faceFound, methods, curve, text,
+      model: { mean: full.mean.map(x => +x.toFixed(6)), scale: full.scale, w: full.w.map(x => +x.toFixed(5)), b: full.b },
+      samples: cache.samples
+    };
+    render(res);
+    const saved = await putJSON('results/results.json', res);
+    setStatus('Done.' + (saved ? ' Saved to results/results.json.' : ' Could not save to the server; use Export.'));
+  } catch (err) { console.error(err); setStatus('Error: ' + (err && err.message ? err.message : err)); }
   $('run').disabled = false;
-});
-
+}
+$('run').addEventListener('click', runExperiment);
 $('exportBtn').addEventListener('click', () => {
-  const blob = new Blob([JSON.stringify({ results: lastResults, models }, null, 1)], { type: 'application/json' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'results.json'; a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(R)], { type: 'application/json' })); a.download = 'results.json'; a.click();
 });
 
-$('imp').addEventListener('change', async e => {
-  try {
-    const j = JSON.parse(await e.target.files[0].text());
-    models = j.models || j; if (j.results) { lastResults = j.results; render(lastResults); }
-    $('tryStatus').textContent = 'Models imported.';
-  } catch (err) { $('tryStatus').textContent = 'Could not read this file.'; }
-});
-
-function showVerdict(card, t, p, prob) {
-  $(card).classList.remove('hide');
+// ---------- Single-photo demo ----------
+function showVerdict(n, prob) {
+  $('v' + n).classList.remove('hide');
   const fake = prob >= 0.5;
-  $(t).textContent = fake ? 'AI-generated' : 'Real photo';
-  $(t).style.color = fake ? 'var(--bad)' : 'var(--good)';
-  $(p).textContent = `Estimated probability of AI: ${pct(prob)}`;
+  $('v' + n + 't').textContent = fake ? 'AI-generated' : 'Real photo';
+  $('v' + n + 't').style.color = fake ? 'var(--bad)' : 'var(--good)';
+  $('v' + n + 'p').textContent = `Estimated probability of AI: ${pct(prob)}`;
 }
 $('one').addEventListener('change', async e => {
   const f = e.target.files[0]; if (!f) return;
-  if (!models) { $('tryStatus').textContent = 'Run the experiment or import models.json first.'; return; }
-  $('preview').src = URL.createObjectURL(f); $('preview').style.display = 'block';
+  const say = t => { $('tryStatus').textContent = t; };
+  if (!R) { say('No trained model yet: run the experiment first.'); return; }
   try {
-    await loadEncoder(t => { $('tryStatus').textContent = t; });
-    $('tryStatus').textContent = 'Analysing…';
-    const v = await embed(f);
-    showVerdict('vA', 'vAt', 'vAp', predict(models.baseline, v));
-    showVerdict('vB', 'vBt', 'vBp', predict(models.improved, v));
-    $('tryStatus').textContent = '';
-  } catch (err) { $('tryStatus').textContent = 'Error: ' + err.message; }
+    ['v1', 'v2', 'v3'].forEach(id => $(id).classList.add('hide'));
+    await loadFace(say); await loadEncoder(say);
+    say('Analysing…');
+    const { jpeg, found } = await faceCrop(f);
+    $('preview').src = URL.createObjectURL(jpeg); $('preview').style.display = 'block';
+    const raw = await RawImage.fromBlob(jpeg), v = await embedRaw(raw);
+    showVerdict(3, predict(R.model, v)); showVerdict(2, zeroShot(R.text, v));
+    say((found ? '' : 'No face found, using the centre of the photo. ') + 'Asking the open-source detector…');
+    await loadExisting(say);
+    showVerdict(1, await existingScore(raw));
+    say(found ? '' : 'No face found, the centre of the photo was used.');
+  } catch (err) { console.error(err); say('Error: ' + err.message); }
 });
 
-try {
-  const m = localStorage.getItem('faceproof-models'), r = localStorage.getItem('faceproof-results');
-  if (m) models = JSON.parse(m);
-  if (r) { lastResults = JSON.parse(r); render(lastResults); }
-} catch (e) {}
+// ---------- Start ----------
+getJSON('results/results.json').then(render).catch(() => { $('resultSub').textContent = 'No saved results yet. Start the local server and press “Re-run experiment”.'; });
 </script>
 </body>
 </html>

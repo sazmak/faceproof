@@ -53,9 +53,19 @@
 | [prithivMLmods/deepfake-detector-model-v1](https://huggingface.co/prithivMLmods/deepfake-detector-model-v1/tree/main) | SigLIP2 | метрики не проверены |
 | [Ateeqq/ai-vs-human-image-detector](https://ateeqq-ai-image-detector.hf.space) | SigLIP | метрики не проверены |
 
+### Детекторы, которые запускаются в браузере (ONNX, transformers.js)
+
+Проверено 13.11.2026 через API Hugging Face: смотрели список файлов, `config.json` и карточки моделей.
+
+| Модель | Что это | Решение |
+|---|---|---|
+| [onnx-community/Deep-Fake-Detector-v2-Model-ONNX](https://huggingface.co/onnx-community/Deep-Fake-Detector-v2-Model-ONNX) | ViT-base 224, классы `Realism` и `Deepfake`, квантованная версия 83 МБ | **Взят как «детектор до улучшения».** Понятные классы, стандартная предобработка. |
+| [onnx-community/CommunityForensics-DeepfakeDet-ViT-ONNX](https://huggingface.co/onnx-community/CommunityForensics-DeepfakeDet-ViT-ONNX) | ViT-small 384 из статьи Community Forensics. По карточке: 2,7 млн изображений, 4803 генератора | Не взят: один выход без подписей классов и своя предобработка 440→384. Без проверки на Python есть риск неверно прочитать ответ модели. |
+| [onnx-community/deepfake_vs_real_image_detection-ONNX](https://huggingface.co/onnx-community/deepfake_vs_real_image_detection-ONNX) | ViT-base 224, классы `Real` и `Fake` | Запасной вариант. |
+
 ## 5. Датасеты
 
-- [140k Real and Fake Faces](https://huggingface.co/datasets/TheKernel01/140k-Real-and-Fake-Faces): 70 тыс. настоящих лиц из FFHQ и 70 тыс. лиц StyleGAN. Оригинал на Kaggle: `xhlulu/140k-real-and-fake-faces`. Берём как «исходный датасет».
+- [140k Real and Fake Faces](https://huggingface.co/datasets/TheKernel01/140k-Real-and-Fake-Faces): 70 тыс. настоящих лиц из FFHQ и 70 тыс. лиц StyleGAN, 256×256. Оригинал на Kaggle: `xhlulu/140k-real-and-fake-faces`. Из него взяты 420 настоящих лиц (первые 420 строк с меткой `real` из части `train`).
 - [FFHQ](https://github.com/NVlabs/ffhq-dataset): настоящие лица, лицензия CC BY-NC-SA 4.0 (некоммерческое использование).
 
 ## 6. Почему выбран CLIP + линейная голова
