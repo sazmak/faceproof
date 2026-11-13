@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FaceProof — AI face detector, improved with new synthetic data</title>
+<style>
+  :root{
+    --bg:#0c0f14; --panel:#141922; --panel2:#1a212d; --line:#273142;
+    --text:#e8edf5; --muted:#93a0b5; --accent:#5eead4; --warn:#fbbf24; --bad:#fb7185; --good:#4ade80;
+    --a:#7c8aa5; --b:#5eead4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 "Segoe UI",system-ui,sans-serif}
+  a{color:var(--accent)}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  header{padding:56px 0 28px;border-bottom:1px solid var(--line)}
+  .tag{font:600 12px/1 ui-monospace,Consolas,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+  h1{font-size:clamp(30px,5vw,50px);line-height:1.08;margin:14px 0 14px;letter-spacing:-.02em;text-wrap:balance}
+  h2{font-size:24px;margin:0 0 6px;letter-spacing:-.01em}
+  h3{font-size:16px;margin:0 0 6px}
+  .lead{color:var(--muted);font-size:18px;max-width:62ch}
+  section{padding:40px 0;border-bottom:1px solid var(--line)}
+  .sub{color:var(--muted);margin:0 0 20px;max-width:70ch}
+  .grid{display:grid;gap:14px}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .card p{margin:0;color:var(--muted);font-size:14.5px}
+  .num{font:700 12px ui-monospace,Consolas,monospace;color:var(--accent);margin-bottom:8px}
+  label.pick{display:block;background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:16px;cursor:pointer}
+  label.pick:hover{border-color:var(--accent)}
+  label.pick input{display:none}
+  label.pick b{display:block;margin-bottom:2px}
+  label.pick span{color:var(--muted);font-size:13.5px}
+  label.pick em{display:block;margin-top:8px;font:600 13px ui-monospace,Consolas,monospace;color:var(--accent);font-style:normal}
+  button{font:600 15px "Segoe UI",system-ui,sans-serif;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 16px;cursor:pointer}
+  button.primary{background:var(--accent);color:#06241f;border-color:var(--accent)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+  .status{font:13px ui-monospace,Consolas,monospace;color:var(--muted);min-height:20px;margin-top:12px;white-space:pre-wrap}
+  .bar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .15s}
+  table{width:100%;border-collapse:collapse;font-size:14.5px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+  td.n{font:600 14px ui-monospace,Consolas,monospace;font-variant-numeric:tabular-nums}
+  .up{color:var(--good)} .down{color:var(--bad)}
+  .tw{overflow-x:auto}
+  .cmp{display:grid;grid-template-columns:150px 1fr 56px;gap:8px;align-items:center;font-size:13.5px;margin:6px 0}
+  .cmp .t{height:12px;background:var(--panel2);border-radius:3px;overflow:hidden}
+  .cmp .t i{display:block;height:100%}
+  .headline{font-size:20px;margin:0 0 16px;text-wrap:balance}
+  .verdict{font:700 26px/1.1 "Segoe UI",system-ui,sans-serif;margin:6px 0}
+  #preview{max-width:100%;max-height:300px;border-radius:10px;border:1px solid var(--line);display:none}
+  .hide{display:none}
+  .note{font-size:13.5px;color:var(--muted)}
+  code{font:13px ui-monospace,Consolas,monospace;background:var(--panel2);padding:1px 5px;border-radius:4px}
+  footer{padding:28px 0 60px;color:var(--muted);font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="tag">ICT · Assignment #2 · Computer Vision · Option B</div>
+  <h1>Detectors miss faces from generators they have never seen. We fix that with data.</h1>
+  <p class="lead">FaceProof takes a real-vs-AI face detector, adds a new set of 314 AI-generated faces to its training data, and measures how much better it catches fakes from the new generator.</p>
+</header>
+
+<section>
+  <h2>How it works</h2>
+  <p class="sub">The detector follows the UnivFD recipe (Ojha et al., CVPR 2023): a frozen CLIP image encoder and a small trainable linear classifier on top. Only the training data changes between the two versions.</p>
+  <div class="grid g3">
+    <div class="card"><div class="num">01 · ORIGINAL DATASET</div><h3>Baseline detector</h3><p>Trained on real faces and fakes from an open dataset (older generator).</p></div>
+    <div class="card"><div class="num">02 · ENRICHED DATASET</div><h3>Improved detector</h3><p>Same model, same settings. Training set extended with our newly generated faces.</p></div>
+    <div class="card"><div class="num">03 · COMPARISON</div><h3>Same held-out test</h3><p>Both versions are scored on images neither has seen: real, old fakes, new fakes.</p></div>
+  </div>
+</section>
+
+<section id="lab">
+  <h2>Experiment</h2>
+  <p class="sub">Choose three folders. Everything runs in this browser tab: the photos are not uploaded anywhere. The first run downloads the CLIP encoder (about 90 MB) from Hugging Face.</p>
+  <div class="grid g3">
+    <label class="pick"><b>Real faces</b><span>Photos of real people, e.g. FFHQ</span><input type="file" id="fReal" webkitdirectory multiple accept="image/*"><em id="cReal">no folder chosen</em></label>
+    <label class="pick"><b>Original fakes</b><span>AI faces from the open dataset</span><input type="file" id="fOld" webkitdirectory multiple accept="image/*"><em id="cOld">no folder chosen</em></label>
+    <label class="pick"><b>New fakes (ours)</b><span>The 314 newly generated faces</span><input type="file" id="fNew" webkitdirectory multiple accept="image/*"><em id="cNew">no folder chosen</em></label>
+  </div>
+  <div class="row">
+    <button class="primary" id="run" disabled>Run experiment</button>
+    <button id="exportBtn" disabled>Export results.json</button>
+    <span class="note">Split: 80% train / 20% test, fixed seed 42.</span>
+  </div>
+  <div class="bar"><i id="prog"></i></div>
+  <div class="status" id="status">Waiting for three folders (at least 20 images each).</div>
+
+  <div id="results" class="hide" style="margin-top:28px">
+    <p class="headline" id="headline"></p>
+    <div id="bars" style="margin-bottom:22px"></div>
+    <div class="tw"><table>
+      <thead><tr><th>Metric (held-out test)</th><th>Baseline · original data</th><th>Improved · enriched data</th><th>Change</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <p class="note" id="sizes" style="margin-top:12px"></p>
+  </div>
+</section>
+
+<section id="try">
+  <h2>Try the detector</h2>
+  <p class="sub">Upload one face photo and compare what both versions say. Available after the experiment has been run once in this browser, or after importing a saved model file.</p>
+  <div class="row" style="margin-top:0">
+    <label class="pick" style="flex:1;min-width:240px"><b>Choose a photo</b><span>JPG, PNG or WebP</span><input type="file" id="one" accept="image/*"></label>
+    <label class="pick" style="flex:1;min-width:240px"><b>Import models.json</b><span>Saved by "Export results.json"</span><input type="file" id="imp" accept=".json"></label>
+  </div>
+  <div class="status" id="tryStatus"></div>
+  <div class="grid g3" style="margin-top:14px;align-items:start">
+    <img id="preview" alt="Uploaded photo">
+    <div class="card hide" id="vA"><div class="num" style="color:var(--a)">BASELINE</div><div class="verdict" id="vAt"></div><p id="vAp"></p></div>
+    <div class="card hide" id="vB"><div class="num">IMPROVED</div><div class="verdict" id="vBt"></div><p id="vBp"></p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Limits</h2>
+  <p class="sub">A detector score is evidence, not proof. Results depend on the generators and photo styles in the training data, the test set is small, and heavy compression or editing can change the answer. Numbers on this page come only from the experiment you run here.</p>
+</section>
+
+<footer>FaceProof · student research project · source code and step-by-step journal are in the repository.</footer>
+</div>
+
+<script type="module">
+import { AutoProcessor, CLIPVisionModelWithProjection, RawImage, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+env.allowLocalModels = false;
+
+const ENCODER = 'Xenova/clip-vit-base-patch32';
+const SEED = 42, TEST_FRAC = 0.2, MIN_IMAGES = 20;
+const $ = id => document.getElementById(id);
+const sets = { real: [], old: [], fresh: [] };
+let processor, encoder, models = null, lastResults = null;
+
+const isImage = f => /\.(jpe?g|png|webp|bmp|jfif)$/i.test(f.name);
+const setStatus = t => { $('status').textContent = t; };
+const setProg = p => { $('prog').style.width = (p * 100).toFixed(1) + '%'; };
+
+function bindPicker(inputId, countId, key) {
+  $(inputId).addEventListener('change', e => {
+    sets[key] = [...e.target.files].filter(isImage).sort((a, b) => a.name.localeCompare(b.name));
+    $(countId).textContent = sets[key].length + ' images';
+    const ok = Object.values(sets).every(s => s.length >= MIN_IMAGES);
+    $('run').disabled = !ok;
+    if (ok) setStatus('Ready.');
+  });
+}
+bindPicker('fReal', 'cReal', 'real'); bindPicker('fOld', 'cOld', 'old'); bindPicker('fNew', 'cNew', 'fresh');
+
+async function loadEncoder(report) {
+  if (encoder) return;
+  report('Loading CLIP encoder (first run downloads about 90 MB)…');
+  processor = await AutoProcessor.from_pretrained(ENCODER);
+  encoder = await CLIPVisionModelWithProjection.from_pretrained(ENCODER, {
+    quantized: true,
+    progress_callback: p => { if (p.status === 'progress' && p.file && p.file.endsWith('.onnx')) report(`Downloading encoder: ${Math.round(p.progress)}%`); }
+  });
+}
+
+async function embed(file) {
+  const image = (await RawImage.fromBlob(file)).rgb();
+  const inputs = await processor(image);
+  const { image_embeds } = await encoder(inputs);
+  const v = Float32Array.from(image_embeds.data);
+  let n = 0; for (const x of v) n += x * x; n = Math.sqrt(n) || 1;
+  for (let i = 0; i < v.length; i++) v[i] /= n;
+  return v;
+}
+
+function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function split(arr, seed) {
+  const r = rng(seed), a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  const nTest = Math.max(1, Math.round(a.length * TEST_FRAC));
+  return { test: a.slice(0, nTest), train: a.slice(nTest) };
+}
+
+// Logistic regression on centred, globally scaled embeddings. Class-balanced loss, full-batch gradient descent.
+function trainLogReg(X, y, { epochs = 1200, lr = 2.0, l2 = 1e-4 } = {}) {
+  const n = X.length, d = X[0].length;
+  const mean = new Float64Array(d);
+  for (const x of X) for (let j = 0; j < d; j++) mean[j] += x[j] / n;
+  let sq = 0; for (const x of X) for (let j = 0; j < d; j++) { const c = x[j] - mean[j]; sq += c * c; }
+  const scale = 1 / Math.sqrt(sq / n || 1);
+  const Z = X.map(x => { const z = new Float64Array(d); for (let j = 0; j < d; j++) z[j] = (x[j] - mean[j]) * scale; return z; });
+  const nPos = y.reduce((s, v) => s + v, 0), nNeg = n - nPos;
+  const wPos = n / (2 * nPos), wNeg = n / (2 * nNeg);
+  const w = new Float64Array(d); let b = 0;
+  const g = new Float64Array(d);
+  for (let ep = 0; ep < epochs; ep++) {
+    g.fill(0); let gb = 0;
+    for (let i = 0; i < n; i++) {
+      const z = Z[i]; let s = b; for (let j = 0; j < d; j++) s += w[j] * z[j];
+      const err = (1 / (1 + Math.exp(-s)) - y[i]) * (y[i] ? wPos : wNeg) / n;
+      for (let j = 0; j < d; j++) g[j] += err * z[j];
+      gb += err;
+    }
+    for (let j = 0; j < d; j++) w[j] -= lr * (g[j] + l2 * w[j]);
+    b -= lr * gb;
+  }
+  return { mean: Array.from(mean), scale, w: Array.from(w), b };
+}
+function predict(m, x) { let s = m.b; for (let j = 0; j < x.length; j++) s += m.w[j] * (x[j] - m.mean[j]) * m.scale; return 1 / (1 + Math.exp(-s)); }
+
+function auc(scoresPos, scoresNeg) {
+  let wins = 0; for (const p of scoresPos) for (const q of scoresNeg) wins += p > q ? 1 : p === q ? 0.5 : 0;
+  return wins / (scoresPos.length * scoresNeg.length);
+}
+function evaluate(m, T) {
+  const pr = T.real.map(x => predict(m, x)), po = T.old.map(x => predict(m, x)), pn = T.fresh.map(x => predict(m, x));
+  const frac = (a, f) => a.filter(f).length / a.length;
+  const tnr = frac(pr, p => p < 0.5), recOld = frac(po, p => p >= 0.5), recNew = frac(pn, p => p >= 0.5);
+  const total = pr.length + po.length + pn.length;
+  return {
+    accuracy: (tnr * pr.length + recOld * po.length + recNew * pn.length) / total,
+    balancedAccuracy: (tnr + (recOld * po.length + recNew * pn.length) / (po.length + pn.length)) / 2,
+    recallNewFakes: recNew, recallOldFakes: recOld, realCorrect: tnr,
+    auc: auc([...po, ...pn], pr)
+  };
+}
+
+const pct = v => (v * 100).toFixed(1) + '%';
+function render(res) {
+  const rows = [
+    ['New-generator fakes caught (recall)', 'recallNewFakes'],
+    ['Original fakes caught (recall)', 'recallOldFakes'],
+    ['Real faces kept as real', 'realCorrect'],
+    ['Balanced accuracy', 'balancedAccuracy'],
+    ['Accuracy (all test images)', 'accuracy'],
+    ['ROC AUC', 'auc']
+  ];
+  $('tbody').innerHTML = rows.map(([label, k]) => {
+    const a = res.baseline[k], b = res.improved[k], d = (b - a) * 100;
+    const cls = Math.abs(d) < 0.05 ? '' : d > 0 ? 'up' : 'down';
+    const fmt = k === 'auc' ? v => v.toFixed(3) : pct;
+    const dTxt = k === 'auc' ? (b - a >= 0 ? '+' : '') + (b - a).toFixed(3) : (d >= 0 ? '+' : '') + d.toFixed(1) + ' pp';
+    return `<tr><td>${label}</td><td class="n">${fmt(a)}</td><td class="n">${fmt(b)}</td><td class="n ${cls}">${dTxt}</td></tr>`;
+  }).join('');
+  const line = (name, v, color) => `<div class="cmp"><span>${name}</span><div class="t"><i style="width:${(v * 100).toFixed(1)}%;background:${color}"></i></div><b>${pct(v)}</b></div>`;
+  $('bars').innerHTML = '<div class="note" style="margin-bottom:6px">New-generator fakes caught</div>' +
+    line('Baseline', res.baseline.recallNewFakes, 'var(--a)') + line('Improved', res.improved.recallNewFakes, 'var(--b)');
+  const a = res.baseline.recallNewFakes, b = res.improved.recallNewFakes;
+  $('headline').textContent = b > a
+    ? `Adding ${res.sizes.train.fresh} new synthetic faces to training raised detection of the new generator from ${pct(a)} to ${pct(b)}.`
+    : `On this data the enriched training set did not raise detection of the new generator (${pct(a)} → ${pct(b)}).`;
+  const s = res.sizes;
+  $('sizes').textContent = `Train: ${s.train.real} real, ${s.train.old} original fakes, ${s.train.fresh} new fakes (new fakes used only by the improved version). Test: ${s.test.real} real, ${s.test.old} original fakes, ${s.test.fresh} new fakes. Encoder: ${ENCODER}, linear head, threshold 0.5.`;
+  $('results').classList.remove('hide');
+  $('exportBtn').disabled = false;
+}
+
+$('run').addEventListener('click', async () => {
+  $('run').disabled = true;
+  try {
+    await loadEncoder(setStatus);
+    const E = {}; const total = sets.real.length + sets.old.length + sets.fresh.length; let done = 0, skipped = 0;
+    const t0 = performance.now();
+    for (const key of ['real', 'old', 'fresh']) {
+      E[key] = [];
+      for (const f of sets[key]) {
+        try { E[key].push(await embed(f)); } catch (err) { skipped++; console.warn('Skipped', f.name, err); }
+        done++; setProg(done / total);
+        if (done % 5 === 0) { const eta = (performance.now() - t0) / done * (total - done) / 1000; setStatus(`Encoding images: ${done}/${total} · about ${Math.ceil(eta)} s left`); await new Promise(r => setTimeout(r)); }
+      }
+    }
+    setStatus('Training both versions…'); await new Promise(r => setTimeout(r, 30));
+    const S = { real: split(E.real, SEED), old: split(E.old, SEED + 1), fresh: split(E.fresh, SEED + 2) };
+    const T = { real: S.real.test, old: S.old.test, fresh: S.fresh.test };
+    const lab = (arr, v) => arr.map(() => v);
+    const XA = [...S.real.train, ...S.old.train], yA = [...lab(S.real.train, 0), ...lab(S.old.train, 1)];
+    const XB = [...XA, ...S.fresh.train], yB = [...yA, ...lab(S.fresh.train, 1)];
+    const mA = trainLogReg(XA, yA), mB = trainLogReg(XB, yB);
+    models = { encoder: ENCODER, baseline: mA, improved: mB };
+    lastResults = {
+      date: new Date().toISOString(), encoder: ENCODER, seed: SEED, skippedImages: skipped,
+      sizes: { train: { real: S.real.train.length, old: S.old.train.length, fresh: S.fresh.train.length }, test: { real: T.real.length, old: T.old.length, fresh: T.fresh.length } },
+      baseline: evaluate(mA, T), improved: evaluate(mB, T)
+    };
+    render(lastResults);
+    try { localStorage.setItem('faceproof-models', JSON.stringify(models)); localStorage.setItem('faceproof-results', JSON.stringify(lastResults)); } catch (e) {}
+    setStatus(`Done in ${((performance.now() - t0) / 1000).toFixed(0)} s.` + (skipped ? ` ${skipped} files could not be read and were skipped.` : ''));
+  } catch (err) {
+    console.error(err); setStatus('Error: ' + (err && err.message ? err.message : err));
+  }
+  $('run').disabled = false;
+});
+
+$('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify({ results: lastResults, models }, null, 1)], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'results.json'; a.click();
+});
+
+$('imp').addEventListener('change', async e => {
+  try {
+    const j = JSON.parse(await e.target.files[0].text());
+    models = j.models || j; if (j.results) { lastResults = j.results; render(lastResults); }
+    $('tryStatus').textContent = 'Models imported.';
+  } catch (err) { $('tryStatus').textContent = 'Could not read this file.'; }
+});
+
+function showVerdict(card, t, p, prob) {
+  $(card).classList.remove('hide');
+  const fake = prob >= 0.5;
+  $(t).textContent = fake ? 'AI-generated' : 'Real photo';
+  $(t).style.color = fake ? 'var(--bad)' : 'var(--good)';
+  $(p).textContent = `Estimated probability of AI: ${pct(prob)}`;
+}
+$('one').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f) return;
+  if (!models) { $('tryStatus').textContent = 'Run the experiment or import models.json first.'; return; }
+  $('preview').src = URL.createObjectURL(f); $('preview').style.display = 'block';
+  try {
+    await loadEncoder(t => { $('tryStatus').textContent = t; });
+    $('tryStatus').textContent = 'Analysing…';
+    const v = await embed(f);
+    showVerdict('vA', 'vAt', 'vAp', predict(models.baseline, v));
+    showVerdict('vB', 'vBt', 'vBp', predict(models.improved, v));
+    $('tryStatus').textContent = '';
+  } catch (err) { $('tryStatus').textContent = 'Error: ' + err.message; }
+});
+
+try {
+  const m = localStorage.getItem('faceproof-models'), r = localStorage.getItem('faceproof-results');
+  if (m) models = JSON.parse(m);
+  if (r) { lastResults = JSON.parse(r); render(lastResults); }
+} catch (e) {}
+</script>
+</body>
+</html>
