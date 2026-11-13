@@ -54,7 +54,15 @@
   #preview{width:100%;max-width:256px;border-radius:10px;border:1px solid var(--line);display:none}
   .strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
   .strip img{width:84px;height:84px;border-radius:6px;border:1px solid var(--line)}
-  .hide{display:none}
+  .livewrap{display:grid;grid-template-columns:minmax(0,480px) minmax(240px,1fr);gap:14px;margin-top:16px;align-items:start}
+  @media (max-width:760px){.livewrap{grid-template-columns:1fr}}
+  .cam{position:relative;transform:scaleX(-1);border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#000}
+  .cam video{display:block;width:100%}
+  #camBox{position:absolute;border:2px solid var(--accent);border-radius:6px;display:none;transition:all .12s linear}
+  .big{font:700 56px/1 "Segoe UI",system-ui,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin:4px 0}
+  .meter{height:10px;background:var(--panel2);border-radius:5px;overflow:hidden;margin:12px 0 10px}
+  .meter i{display:block;height:100%;width:0;background:var(--good);transition:width .15s,background .15s}
+  .hide{display:none !important}
   .note{font-size:13.5px;color:var(--muted);max-width:80ch}
   code{font:13px ui-monospace,Consolas,monospace;background:var(--panel2);padding:1px 5px;border-radius:4px}
   svg text{font:12px "Segoe UI",system-ui,sans-serif;fill:var(--muted)}
@@ -124,6 +132,26 @@
     <div class="card hide" id="v3"><div class="num">OURS · TRAINED ON NEW DATA</div><div class="verdict" id="v3t"></div><p id="v3p"></p></div>
     <div class="card hide" id="v2"><div class="num" style="color:var(--m2)">CLIP · NO TRAINING</div><div class="verdict" id="v2t"></div><p id="v2p"></p></div>
     <div class="card hide" id="v1"><div class="num" style="color:var(--m1)">OPEN-SOURCE DETECTOR</div><div class="verdict" id="v1t"></div><p id="v1p"></p></div>
+  </div>
+</section>
+
+<section id="live">
+  <h2>Live camera</h2>
+  <p class="sub">Point the camera at a face and watch the score update several times a second. Each frame goes through the same steps as the test images: find the face, crop, compress, score. The video stays in this browser tab and is not recorded.</p>
+  <div class="row" style="margin-top:0">
+    <button class="primary" id="camBtn">Start camera</button>
+    <span class="note" id="camStatus"></span>
+  </div>
+  <div class="livewrap hide" id="liveWrap">
+    <div class="cam"><video id="cam" playsinline muted></video><div id="camBox"></div></div>
+    <div class="card">
+      <div class="num">OURS · LIVE</div>
+      <div class="big" id="liveNum">–</div>
+      <div class="verdict" id="liveVerdict">Looking for a face…</div>
+      <div class="meter"><i id="liveBar"></i></div>
+      <p id="liveSub"></p>
+      <p class="note" style="margin-top:12px">The detector learned from portraits and photo archives, not from webcam video. Treat the live score as a demonstration, not a measurement.</p>
+    </div>
   </div>
 </section>
 
@@ -200,8 +228,8 @@ async function textVectors(report) {
 }
 
 // ---------- Same preprocessing for every image ----------
-async function faceCrop(blob) {
-  const bmp = await createImageBitmap(blob);
+async function faceCrop(source) {   // source: an image file/blob or a playing <video> (camera frame)
+  const bmp = await createImageBitmap(source);
   const W = bmp.width, H = bmp.height;
   let cx = W / 2, cy = H / 2, side = Math.min(W, H), found = false;
   // Look for faces in the whole image and, for large images, in overlapping tiles (small faces are missed otherwise).
@@ -221,7 +249,7 @@ async function faceCrop(blob) {
   g.drawImage(bmp, x, y, side, side, 0, 0, CROP_SIZE, CROP_SIZE);
   bmp.close();
   const jpeg = await new Promise(res => c.toBlob(res, 'image/jpeg', JPEG_Q));
-  return { jpeg, found };
+  return { jpeg, found, box: { x: x / W, y: y / H, w: side / W, h: side / H } };
 }
 async function embedRaw(raw) {
   const { image_embeds } = await encoder(await processor(raw));
@@ -416,6 +444,71 @@ $('one').addEventListener('change', async e => {
     showVerdict(1, await existingScore(raw));
     say(found ? '' : 'No face found, the centre of the photo was used.');
   } catch (err) { console.error(err); say('Error: ' + err.message); }
+});
+
+// ---------- Live camera ----------
+let camStream = null, camOn = false;
+function stopCamera() {
+  camOn = false;
+  if (camStream) camStream.getTracks().forEach(t => t.stop());
+  camStream = null; $('cam').srcObject = null;
+  $('liveWrap').classList.add('hide'); $('camBtn').textContent = 'Start camera'; $('camStatus').textContent = '';
+}
+async function liveLoop() {
+  const v = $('cam'); let smooth = null, frames = 0; const t0 = performance.now();
+  while (camOn) {
+    if (v.readyState >= 2 && v.videoWidth) {
+      try {
+        const { jpeg, found, box } = await faceCrop(v);
+        if (!camOn) break;
+        if (found) {
+          const pAI = predict(R.model, await embedRaw(await RawImage.fromBlob(jpeg)));
+          if (!camOn) break;
+          smooth = smooth === null ? pAI : 0.6 * smooth + 0.4 * pAI;   // light smoothing so the number does not flicker
+          const real = 1 - smooth, isReal = real >= 0.5;
+          $('liveNum').textContent = Math.round(real * 100) + '%';
+          $('liveNum').style.color = isReal ? 'var(--good)' : 'var(--bad)';
+          $('liveVerdict').textContent = isReal ? 'Real person' : 'AI-generated';
+          $('liveVerdict').style.color = isReal ? 'var(--good)' : 'var(--bad)';
+          $('liveBar').style.width = (real * 100).toFixed(0) + '%';
+          $('liveBar').style.background = isReal ? 'var(--good)' : 'var(--bad)';
+          $('liveSub').textContent = `Estimated probability that this is a real person. AI-generated: ${Math.round(smooth * 100)}%.`;
+          Object.assign($('camBox').style, { display: 'block', left: box.x * 100 + '%', top: box.y * 100 + '%', width: box.w * 100 + '%', height: box.h * 100 + '%' });
+        } else {
+          smooth = null;
+          $('liveNum').textContent = '–'; $('liveNum').style.color = '';
+          $('liveVerdict').textContent = 'No face in view'; $('liveVerdict').style.color = 'var(--muted)';
+          $('liveBar').style.width = '0'; $('liveSub').textContent = 'Move closer or face the camera.';
+          $('camBox').style.display = 'none';
+        }
+        frames++;
+        $('camStatus').textContent = `${(frames / ((performance.now() - t0) / 1000)).toFixed(1)} checks per second`;
+      } catch (err) { console.error(err); $('camStatus').textContent = 'Error: ' + err.message; }
+    }
+    await tick();
+  }
+}
+$('camBtn').addEventListener('click', async () => {
+  if (camOn) { stopCamera(); return; }
+  const say = t => { $('camStatus').textContent = t; };
+  if (!R) { say('No trained model yet: run the experiment first.'); return; }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { say('This browser cannot open a camera here. Open the page at http://localhost:8765 in Chrome or Edge.'); return; }
+  $('camBtn').disabled = true;
+  try {
+    await loadFace(say); await loadEncoder(say);
+    say('Waiting for camera permission…');
+    camStream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' }, audio: false });
+    const v = $('cam'); v.srcObject = camStream; await v.play();
+    $('liveWrap').classList.remove('hide'); $('camBtn').textContent = 'Stop camera'; say('');
+    camOn = true; liveLoop();
+  } catch (err) {
+    console.error(err);
+    const msg = err.name === 'NotAllowedError' ? 'Camera access was blocked. Allow the camera for this page and press Start again.'
+      : err.name === 'NotFoundError' ? 'No camera was found on this computer.'
+      : 'Could not start the camera: ' + err.message;
+    stopCamera(); say(msg);
+  }
+  $('camBtn').disabled = false;
 });
 
 // ---------- Start ----------
